@@ -63,24 +63,28 @@ audioLoader.load('../threejs/data/bell.mp3', function (buffer) {
 	sound.setBuffer(buffer);
 	sound.setLoop(false);
 	sound.setVolume(1.3);
+	sounds.push(sound);
 });
 
 audioLoader.load('../threejs/data/bell2.mp3', function (buffer) {
 	sound2.setBuffer(buffer);
 	sound2.setLoop(false);
 	sound2.setVolume(1.3);
+	sounds.push(sound2);
 });
 
 audioLoader.load('../threejs/data/bell3.mp3', function (buffer) {
 	sound3.setBuffer(buffer);
 	sound3.setLoop(false);
 	sound3.setVolume(1.3);
+	sounds.push(sound3);
 });
 
 audioLoader.load('../threejs/data/bell4.mp3', function (buffer) {
 	sound4.setBuffer(buffer);
 	sound4.setLoop(false);
 	sound4.setVolume(1.3);
+	sounds.push(sound4);
 });
 
 
