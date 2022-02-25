@@ -53,7 +53,7 @@ const sound = new THREE.PositionalAudio(listener);
 
 // load a sound and set it as the Audio object's buffer
 const audioLoader = new THREE.AudioLoader();
-audioLoader.load('../data/bell.mp3', function (buffer) {
+audioLoader.load('../threejs/data/bell.mp3', function (buffer) {
 	sound.setBuffer(buffer);
 	sound.setLoop(false);
 	sound.setVolume(0.5);
@@ -65,7 +65,7 @@ camera.add(padListener);
 
 const padSound = new THREE.PositionalAudio(padListener);
 
-audioLoader.load('../data/pad.mp3', function (buffer) {
+audioLoader.load('../threejs/data/pad.mp3', function (buffer) {
 	padSound.setBuffer(buffer);
 	padSound.setLoop(true);
 	padSound.setVolume(0.5);
@@ -81,7 +81,7 @@ const loader = new THREE.GLTFLoader();
 
 
 
-loader.load('../data/Lukas.glb', function (gltf) {
+loader.load('../threejs/data/Lukas.glb', function (gltf) {
 
 	lukas = gltf.scene;
 	lukasCollider = lukas.getObjectByName('LukasCollider');
@@ -96,7 +96,7 @@ loader.load('../data/Lukas.glb', function (gltf) {
 
 });
 
-loader.load('../data/MuscHammer.glb', function (gltf) {
+loader.load('../threejs/data/MuscHammer.glb', function (gltf) {
 
 	setUpPersons(gltf);
 
