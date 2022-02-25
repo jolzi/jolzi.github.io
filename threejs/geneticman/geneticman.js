@@ -56,7 +56,7 @@ const audioLoader = new THREE.AudioLoader();
 audioLoader.load('../threejs/data/bell.mp3', function (buffer) {
 	sound.setBuffer(buffer);
 	sound.setLoop(false);
-	sound.setVolume(0.5);
+	sound.setVolume(1.4);
 });
 
 
@@ -68,7 +68,7 @@ const padSound = new THREE.PositionalAudio(padListener);
 audioLoader.load('../threejs/data/pad.mp3', function (buffer) {
 	padSound.setBuffer(buffer);
 	padSound.setLoop(true);
-	padSound.setVolume(0.5);
+	padSound.setVolume(3.0);
 	padSound.play();
 });
 
