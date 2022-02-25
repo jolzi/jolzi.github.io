@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Three js workshop</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">
+
+    <!-- Three.js -->
+    <script src="../lib/three.min.js"></script>
+
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/loaders/FBXLoader.js"></script>
+    <script src="https://unpkg.com/fflate"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fflate/umd/index.js"></script>
+
+    <!-- Orbit Controls -->
+    <script src="../lib/OrbitControls.js"></script>
+
+    <script src="person.js"></script>
+    <script src="population.js"></script>
+
+    <!-- dat.GUI -->
+    <script src="../lib/dat.gui.min.js"></script>
+
+
+</head>
+
+<body>
+
+    <div id="header">
+        <div id="geneticStriker">Genetic Striker</div>
+        <div id="generation">Generation: 1</div>
+        <div id="hits">Hits: 0</div>
+    </div>
+    <script src="geneticman.js"></script>
+</body>
+
+</html>
