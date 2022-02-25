@@ -7,9 +7,10 @@ class Population {
     previousCollision = [];
     collisionWeight;
     currentFitnessFrame = 0;
+    soundIndex = 0;
     sound;
 
-    constructor(initialPersons, targetCollider, popSize, collisionWeight, sound) {
+    constructor(initialPersons, targetCollider, popSize, collisionWeight, sounds) {
         this.persons = initialPersons;
         this.targetCollider = targetCollider;
 
@@ -18,7 +19,7 @@ class Population {
         this.popSize = popSize;
         this.collisionWeight = collisionWeight;
 
-        this.sound = sound;
+        this.sounds = sounds;
     }
 
     setPersons(newPersons) {
@@ -59,6 +60,7 @@ class Population {
             this.persons[i].collisionTimeout = 0;
         }
         this.currentFitnessFrame = 0;
+        this.soundIndex = 0;
     }
 
     //https://stackoverflow.com/questions/11473755/how-to-detect-collision-in-three-js
@@ -87,12 +89,20 @@ class Population {
                 person.fitness[this.currentFitnessFrame] -= this.collisionWeight;
 
                 if (i === 0) {
-                    console.log("Collision");
+                    //console.log("Collision");
 
-                    if (!this.sound.isPlaying) {
-                        this.sound.play();
+                    if (!this.sounds[this.soundIndex].isPlaying) {
+                        this.sounds[this.soundIndex].play();
                     }else{
-                        this.sound.currentTime = 0
+                        this.sounds[this.soundIndex].currentTime = 0
+                    }
+
+                    if(this.soundIndex < this.sounds.length - 1)
+                    {
+                        this.soundIndex++;
+                    }
+                    else{
+                        this.soundIndex = 0;
                     }
                 }
             }

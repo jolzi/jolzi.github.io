@@ -49,14 +49,38 @@ const listener = new THREE.AudioListener();
 camera.add(listener);
 
 // create a global audio source
+// create a global audio source
+const sounds = [];
+
 const sound = new THREE.PositionalAudio(listener);
+const sound2 = new THREE.PositionalAudio(listener);
+const sound3 = new THREE.PositionalAudio(listener);
+const sound4 = new THREE.PositionalAudio(listener);
 
 // load a sound and set it as the Audio object's buffer
 const audioLoader = new THREE.AudioLoader();
 audioLoader.load('../threejs/data/bell.mp3', function (buffer) {
 	sound.setBuffer(buffer);
 	sound.setLoop(false);
-	sound.setVolume(1.4);
+	sound.setVolume(1.3);
+});
+
+audioLoader.load('../threejs/data/bell2.mp3', function (buffer) {
+	sound2.setBuffer(buffer);
+	sound2.setLoop(false);
+	sound2.setVolume(1.3);
+});
+
+audioLoader.load('../threejs/data/bell3.mp3', function (buffer) {
+	sound3.setBuffer(buffer);
+	sound3.setLoop(false);
+	sound3.setVolume(1.3);
+});
+
+audioLoader.load('../threejs/data/bell4.mp3', function (buffer) {
+	sound4.setBuffer(buffer);
+	sound4.setLoop(false);
+	sound4.setVolume(1.3);
 });
 
 
@@ -159,7 +183,7 @@ function setUpPersons(gltf) {
 	}
 
 	persons[setSize - 1].mixer.addEventListener('finished', populationFinished);
-	population = new Population(persons, lukasCollider, setSize, collisionWeight, sound)
+	population = new Population(persons, lukasCollider, setSize, collisionWeight, sounds)
 
 }
 
