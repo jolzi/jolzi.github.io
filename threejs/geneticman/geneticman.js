@@ -1,123 +1,104 @@
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.142.0/build/three.module.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/loaders/GLTFLoader.js';
+import { AudioLoader, AudioListener, PositionalAudio } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/build/three.module.js';
+
+// The rest of your code...
+
 const setSize = 15;
 const mutationProbability = 0.70;
 const mutationSpan = 1.5;
 const collisionWeight = 1;
 
-let camera, scene, renderer, clock, rightArm, collider;
-let rotationKF, tracks, length, clip, mixer, model, mesh, action, action2;
+let camera, scene, renderer, clock;
 let population;
-
-let lukas;
-let lukasCollider;
-let lukasColliderPosition;
-
+let lukas, lukasCollider, lukasColliderPosition;
 let isFinished = false;
-
-let fittest;
-let secondFittest;
-
+let fittest, secondFittest;
 let generationIndex = 1;
 
-camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 20);
-camera.position.set(-5, 2, -5);
+init();
+animate();
 
-clock = new THREE.Clock();
+function init() {
+    // Camera setup
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 20);
+    camera.position.set(-5, 2, -5);
 
-scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
+    // Clock setup
+    clock = new THREE.Clock();
 
-const light = new THREE.HemisphereLight(0xbbbbff, 0x444422);
-light.position.set(0, 1, 0);
-scene.add(light);
+    // Scene setup
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
 
-renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputEncoding = THREE.sRGBEncoding;
-document.body.appendChild(renderer.domElement);
+    // Light setup
+    const light = new THREE.HemisphereLight(0xbbbbff, 0x444422);
+    light.position.set(0, 1, 0);
+    scene.add(light);
 
-window.addEventListener('resize', onWindowResize, false);
+    // Renderer setup
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    document.body.appendChild(renderer.domElement);
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, 1);
-controls.update();
+    // Event listener for window resize
+    window.addEventListener('resize', onWindowResize, false);
 
-// create an AudioListener and add it to the camera
-const listener = new THREE.AudioListener();
-camera.add(listener);
+    // Orbit Controls setup
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0, 1);
+    controls.update();
 
-// create a global audio source
-const sounds = [];
-const sound = new THREE.PositionalAudio(listener);
-const sound2 = new THREE.PositionalAudio(listener);
-const sound3 = new THREE.PositionalAudio(listener);
-const sound4 = new THREE.PositionalAudio(listener);
+    // Audio setup
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
 
-// load a sound and set it as the Audio object's buffer
-const audioLoader = new THREE.AudioLoader();
-audioLoader.load('../threejs/data/bell.mp3', function (buffer) {
-    sound.setBuffer(buffer);
-    sound.setLoop(false);
-    sound.setVolume(1.3);
-    sounds.push(sound);
-});
+    const sounds = setupAudio(listener);
 
-audioLoader.load('../threejs/data/bell2.mp3', function (buffer) {
-    sound2.setBuffer(buffer);
-    sound2.setLoop(false);
-    sound2.setVolume(1.3);
-    sounds.push(sound2);
-});
+    // Update the generation display
+    document.getElementById("generation").innerHTML = "Generation: " + generationIndex;
 
-audioLoader.load('../threejs/data/bell3.mp3', function (buffer) {
-    sound3.setBuffer(buffer);
-    sound3.setLoop(false);
-    sound3.setVolume(1.3);
-    sounds.push(sound3);
-});
+    // Load models
+    const loader = new GLTFLoader();
+    loader.load('../threejs/data/Lukas.glb', function (gltf) {
+        lukas = gltf.scene;
+        lukasCollider = lukas.getObjectByName('LukasCollider');
+        lukasCollider.material.transparent = true;
+        scene.add(lukas);
 
-audioLoader.load('../threejs/data/bell4.mp3', function (buffer) {
-    sound4.setBuffer(buffer);
-    sound4.setLoop(false);
-    sound4.setVolume(1.3);
-    sounds.push(sound4);
-});
+        lukasCollider.add(sounds[0]);
 
-const padListener = new THREE.AudioListener();
-camera.add(padListener);
+        lukasColliderPosition = new THREE.Vector3();
+        lukasColliderPosition.setFromMatrixPosition(lukasCollider.matrixWorld);
+    });
 
-const padSound = new THREE.PositionalAudio(padListener);
-audioLoader.load('../threejs/data/pad.mp3', function (buffer) {
-    padSound.setBuffer(buffer);
-    padSound.setLoop(true);
-    padSound.setVolume(3.0);
-    padSound.play();
-});
+    loader.load('../threejs/data/MuscHammer.glb', function (gltf) {
+        setUpPersons(gltf, sounds);
+    });
+}
 
-document.getElementById("generation").innerHTML = "Generation: " + generationIndex;
+function setupAudio(listener) {
+    const sounds = [];
+    const audioLoader = new THREE.AudioLoader();
 
-// model
-const loader = new THREE.GLTFLoader();
+    for (let i = 1; i <= 4; i++) {
+        const sound = new THREE.PositionalAudio(listener);
+        audioLoader.load(`../threejs/data/bell${i}.mp3`, function (buffer) {
+            sound.setBuffer(buffer);
+            sound.setLoop(false);
+            sound.setVolume(1.3);
+        });
+        sounds.push(sound);
+    }
 
-// Load Hau den Lukas
-loader.load('../threejs/data/Lukas.glb', function (gltf) {
-    lukas = gltf.scene;
-    lukasCollider = lukas.getObjectByName('LukasCollider');
-    lukasCollider.material.transparent = true;
-    scene.add(lukas);
+    return sounds;
+}
 
-    lukasCollider.add(sound);
-
-    lukasColliderPosition = new THREE.Vector3();
-    lukasColliderPosition.setFromMatrixPosition(lukasCollider.matrixWorld);
-});
-
-loader.load('../threejs/data/MuscHammer.glb', function (gltf) {
-    setUpPersons(gltf);
-});
-
-function setUpPersons(gltf) {
-    let persons = [];
+function setUpPersons(gltf, sounds) {
+    const persons = [];
     for (let i = 0; i < setSize; i++) {
         persons[i] = new Person();
 
@@ -125,28 +106,17 @@ function setUpPersons(gltf) {
             persons[i].mesh = gltf.scene;
         } else {
             persons[i].mesh = gltf.scene.clone(true);
-
-            persons[i].mesh.getObjectByName('Object1').material = gltf.scene.getObjectByName('Object1').material.clone();
-            persons[i].mesh.getObjectByName('Object1').material.transparent = true;
-            persons[i].mesh.getObjectByName('Object1').material.opacity = 0;
-
-            persons[i].mesh.getObjectByName('11685_hammer_v1_L3_1').material = gltf.scene.getObjectByName('11685_hammer_v1_L3_1').material.clone();
-            persons[i].mesh.getObjectByName('11685_hammer_v1_L3_1').material.transparent = true;
-            persons[i].mesh.getObjectByName('11685_hammer_v1_L3_1').material.opacity = 0;
-
-            persons[i].mesh.getObjectByName('11685_hammer_v1_L3_2').material = gltf.scene.getObjectByName('11685_hammer_v1_L3_2').material.clone();
-            persons[i].mesh.getObjectByName('11685_hammer_v1_L3_2').material.transparent = true;
-            persons[i].mesh.getObjectByName('11685_hammer_v1_L3_2').material.opacity = 0;
+            makeInvisible(persons[i].mesh, gltf.scene);
         }
 
         persons[i].rightArm = persons[i].mesh.getObjectByName('Bone');
         persons[i].collider = persons[i].mesh.getObjectByName('Collider');
         persons[i].collider.material.transparent = true;
 
-        let rotationKF = new THREE.QuaternionKeyframeTrack('.quaternion', persons[i].times, persons[i].values);
+        const rotationKF = new THREE.QuaternionKeyframeTrack('.quaternion', persons[i].times, persons[i].values);
         persons[i].tracks = [rotationKF];
 
-        let length = -1;
+        const length = -1;
         persons[i].clip = new THREE.AnimationClip('rotate', length, persons[i].tracks);
         persons[i].mixer = new THREE.AnimationMixer(persons[i].rightArm);
         persons[i].action = persons[i].mixer.clipAction(persons[i].clip);
@@ -161,11 +131,21 @@ function setUpPersons(gltf) {
     population = new Population(persons, lukasCollider, setSize, collisionWeight, sounds);
 }
 
+function makeInvisible(mesh, originalScene) {
+    const materialsToClone = ['Object1', '11685_hammer_v1_L3_1', '11685_hammer_v1_L3_2'];
+    materialsToClone.forEach(name => {
+        const material = originalScene.getObjectByName(name).material.clone();
+        material.transparent = true;
+        material.opacity = 0;
+        mesh.getObjectByName(name).material = material;
+    });
+}
+
 function populationFinished() {
     isFinished = true;
     selection();
-    let newPersons = crossover();
-    let mutatedNewPersons = mutation(newPersons);
+    const newPersons = crossover();
+    const mutatedNewPersons = mutation(newPersons);
     updatePopulation(mutatedNewPersons);
     population.resetFitness();
     population.persons[population.persons.length - 1].mixer.addEventListener('finished', populationFinished);
